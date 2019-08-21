@@ -1,10 +1,16 @@
+// list of all required node modules (best practice to have these listed at the top)
 const express = require('express');
 const app = express();
 const port = 3000;
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const allProducts = require('./data/products');
 
-
+// To read all incoming data as json
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cors());
 
 app.use(function(req, res, next){
     console.log(`${req.method} request for ${req.url}`);
@@ -60,3 +66,14 @@ app.listen(port, () => {
     console.clear();
     console.log(`application is running on port ${port}`)
 });
+
+app.post('/product', function(req, res){
+    // console.log('a post request has been made');
+    // console.log(req.body);
+    let product = {
+        name: req.body.name,
+        price: req.body.price,
+        message: 'We are about to send this product to a database'
+    };
+    res.send(product);
+})
