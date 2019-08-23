@@ -82,10 +82,7 @@ app.get('/product/delete/:id', function(req, res){
     res.send(filteredData);
 });
 
-app.listen(port, () => {
-    console.clear();
-    console.log(`application is running on port ${port}`)
-});
+
 
 const Product = require('./models/products');
 app.post('/product', function(req, res){
@@ -109,4 +106,30 @@ app.post('/product', function(req, res){
         res.send(result);
     })
     .catch(err => res.send(err));
+});
+
+const Contact = require('./models/contacts');
+app.post('/contact', function(req, res){
+    const contact = new Contact({
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
+        email: req.body.email,
+        message: req.body.message
+    });
+    console.log(contact);
+    // "save" below sends the user-inputted data (from front end) into our mongo database
+    contact.save().then(result => {
+        res.send(result);
+    })
+    .catch(err => res.send(err));
+});
+
+
+
+
+
+
+app.listen(port, () => {
+    console.clear();
+    console.log(`application is running on port ${port}`)
 });
