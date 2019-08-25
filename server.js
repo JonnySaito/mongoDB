@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const config = require('./config.json');
+const Product = require('./models/products');
 // database is called "shop"; table/database is "products"
 mongoose.connect(`mongodb+srv://${config.MONGO_USERNAME}:${config.MONGO_PASSWORD}@cluster0-vvglk.mongodb.net/shop?retryWrites=true&w=majority`, {useNewUrlParser: true});
 
@@ -33,22 +34,31 @@ app.get('/', function(req, res){
 });
 
 app.get('/allProducts', function(req, res){
-    res.send(allProducts);
+    // res.send(allProducts);
+    Product.find().then((result) => {
+        res.send(result);
+    });
 });
 
 // app.get('/:id', function(req, res){
 //     res.send(allProducts);
 // });
 app.get('/product/:id', function(req, res){
-    const id = req.params.id
-    for (var i = 0; i < allProducts.length; i++) {
-        if(id == allProducts[i].id){
-            res.send(allProducts[i]);
-            break;
-        }
-    }
+    const id = req.params.id;
+    Product.findById(id, function (err, adventure) {
+        res.send(product);
+    });
+    // const id = req.params.id;
+    // for (var i = 0; i < allProducts.length; i++) {
+    //     if(id == allProducts[i].id){
+    //         res.send(allProducts[i]);
+    //         break;
+        // }
+    // }
 });
-// Code below didn't work
+
+
+// Code below didn't work:
 // app.get('/product/:id', function(req, res){
 //     const productIDparam = req.params.id;
 //     let filteredData = [];
@@ -83,8 +93,6 @@ app.get('/product/delete/:id', function(req, res){
 });
 
 
-
-const Product = require('./models/products');
 app.post('/product', function(req, res){
     // console.log('a post request has been made');
     // console.log(req.body);
@@ -107,6 +115,13 @@ app.post('/product', function(req, res){
     })
     .catch(err => res.send(err));
 });
+
+
+
+
+
+
+
 
 const Contact = require('./models/contacts');
 app.post('/contact', function(req, res){
