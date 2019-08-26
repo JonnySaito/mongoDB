@@ -45,7 +45,7 @@ app.get('/allProducts', function(req, res){
 // });
 app.get('/product/:id', function(req, res){
     const id = req.params.id;
-    Product.findById(id, function (err, adventure) {
+    Product.findById(id, function (err, product) {
         res.send(product);
     });
     // const id = req.params.id;
@@ -116,12 +116,16 @@ app.post('/product', function(req, res){
     .catch(err => res.send(err));
 });
 
-
-
-
-
-
-
+app.patch('/editProduct/:id', function(req,res){
+   const id = req.params.id;
+   const newProduct = {
+     name: req.body.name,
+     price: req.body.price
+   }
+   Product.updateOne({_id: id}, newProduct).then(result => {
+     res.send(result);
+   }).catch(err => res.send(err));
+});
 
 const Contact = require('./models/contacts');
 app.post('/contact', function(req, res){
