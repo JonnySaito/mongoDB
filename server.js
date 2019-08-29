@@ -145,35 +145,59 @@ app.post('/contact', function(req, res){
     .catch(err => res.send(err));
 });
 
-// Creating a route for registering new users
+// How to get input from user at front end: req.body.xxx
+// const username = req.body.username;
+// console.log(req.body.username);
+// console.log(req.body.email);
+// console.log(req.body.password);
+
+// Creating a route for REGISTERING new users; checking if the username already exists
 app.post('/users', function(req, res){
-    // const username = req.body.username;
-    // console.log(req.body.username);
-    // console.log(req.body.email);
-    // console.log(req.body.password);
-    // USE hash to keep the password encrypted:
-    const hash = bcrypt.hashSync(req.body.password);
-    const user = new User({
-        _id: new mongoose.Types.ObjectId(),
-        username: req.body.username,
-        email: req.body.email,
-        password: hash
+    User.findOne({username: req.body.username}, function (err, checkUser) {
+        // res.send(checkUser);
+        if(checkUser){
+            res.send('Sorry, username already exists');
+        } else {
+            res.send('Username does not exist; everything is awesome!')
+            // USE hash to keep the password encrypted:
+            const hash = bcrypt.hashSync(req.body.password);
+            console.log(hash);
+            const user = new User({
+                _id: new mongoose.Types.ObjectId(),
+                username: req.body.username,
+                email: req.body.email,
+                password: hash
+            });
+            user.save().then(result =>{
+                res.send(result);
+            })
+            .catch(err => res.send(err));
+        }
+    //
     });
-    user.save().then(result =>{
-        res.send(result);
-    }).catch(err => res.send(err));
-    // console.log(hash);
-})
+});
 
 // When user logs in:
 app.post('/getUser', function(req, res){
-    // if (bcrypt.compareSync('password', hash)) {
-    //     console.log('password matches');
-    // } else {
-    //     console.log('password does not match');
-    // }
-})
+    console.log('server connection working');
+    console.log(req.body.username);
+    console.log(req.body.password);
 
+    User.findOne({username: req.body.username}, function (err, checkUser) {
+        if(checkUser){
+            if (bcrypt.compareSync(req.body.password, checkUser.password)) {
+                console.log('password matches');
+                res.send(checkUser)
+            } else {
+                console.log('password does not match');
+                res.send('invalid password');
+            }
+        } else {
+            res.send('invalid user');
+            console.log('Log in and everything is awesome!')
+        }
+    });
+});
 
 app.listen(port, () => {
     console.clear();
