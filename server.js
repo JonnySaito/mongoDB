@@ -8,8 +8,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const config = require('./config.json');
-const Product = require('./models/products');
-const User = require('./models/users');
+
 // database is called "shop"; table/database is "products"
 mongoose.connect(`mongodb+srv://${config.MONGO_USERNAME}:${config.MONGO_PASSWORD}@cluster0-vvglk.mongodb.net/shop?retryWrites=true&w=majority`, {useNewUrlParser: true});
 
@@ -19,6 +18,8 @@ db.once('open', function() {
   console.log('Brothers and sisters, we are all connected!');
 });
 
+const Product = require('./models/products');
+const User = require('./models/users');
 const allProducts = require('./data/products');
 
 // To read all incoming data as json
@@ -127,6 +128,13 @@ app.patch('/editProduct/:id', function(req,res){
    Product.updateOne({_id: id}, newProduct).then(result => {
      res.send(result);
    }).catch(err => res.send(err));
+});
+
+app.delete('/product/:id', function(req, res){
+    const id = req.params.id;
+    Product.deleteOne({ _id: id }, function (err) {
+        res.send('deleted');
+    });
 });
 
 const Contact = require('./models/contacts');
