@@ -36,6 +36,22 @@ app.get('/', function(req, res){
     res.send('Welcome to our Products API. Use endpoints to filter out the data');
 });
 
+// Add a new Product (CREATE)
+app.post('/product', function(req, res){
+    const product = new Product({
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
+        price: req.body.price,
+        user_id: req.body.userId
+    });
+    console.log(product);
+    // "save" below sends the user-inputted data (from front end) into our mongo database
+    product.save().then(result => {
+        res.send(result);
+    })
+    .catch(err => res.send(err));
+});
+
 app.get('/allProducts', function(req, res){
     // res.send(allProducts);
     Product.find().then((result) => {
@@ -43,35 +59,16 @@ app.get('/allProducts', function(req, res){
     });
 });
 
-// app.get('/:id', function(req, res){
-//     res.send(allProducts);
-// });
-app.get('/product/:id', function(req, res){
+app.post('/product/:id', function(req, res){
     const id = req.params.id;
     Product.findById(id, function (err, product) {
-        res.send(product);
+        if(product['user_id'] == req.body.userId){
+            res.send(product);
+        } else{
+            res.send('401');
+        }
     });
-    // const id = req.params.id;
-    // for (var i = 0; i < allProducts.length; i++) {
-    //     if(id == allProducts[i].id){
-    //         res.send(allProducts[i]);
-    //         break;
-        // }
-    // }
 });
-
-
-// Code below didn't work:
-// app.get('/product/:id', function(req, res){
-//     const productIDparam = req.params.id;
-//     let filteredData = [];
-//     for (var i = 0; i < allProducts.length; i++) {
-//         if(allProducts[i].id.toString() === productIDparam){
-//             filteredData.push(allProducts[i]);
-//         }
-//     }
-//     res.send(filteredData);
-// });
 
 app.get('/product/edit/:id', function(req, res){
     const productIDparam = req.params.id;
@@ -95,41 +92,25 @@ app.get('/product/delete/:id', function(req, res){
     res.send(filteredData);
 });
 
-
-app.post('/product', function(req, res){
-    // console.log('a post request has been made');
-    // console.log(req.body);
-    // let product = {
-    //     name: req.body.name,
-    //     price: req.body.price,
-    //     message: 'We are about to send this product to a database'
-    // };
-    // res.send(product);
-
-    const product = new Product({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        price: req.body.price
-    });
-    console.log(product);
-    // "save" below sends the user-inputted data (from front end) into our mongo database
-    product.save().then(result => {
-        res.send(result);
-    })
-    .catch(err => res.send(err));
+// Update a product based on id
+app.patch('/editProduct/:id', function(req, res){
+    const id = req.params.id;
+    Product.findById(id, function(err, product){
+        if(product['user_id'] == req.body.userId){
+            const newProduct = {
+                name: req.body.name,
+                price: req.body.price
+            };
+            Product.updateOne({ _id : id }, newProduct).then(result => {
+                res.send(result);
+            }).catch(err => res.send(err));
+        } else {
+            res.send('401');
+        }
+    }).catch(err => res.send('cannot find product with that id'));
 });
 
-app.patch('/editProduct/:id', function(req,res){
-   const id = req.params.id;
-   const newProduct = {
-     name: req.body.name,
-     price: req.body.price
-   }
-   Product.updateOne({_id: id}, newProduct).then(result => {
-     res.send(result);
-   }).catch(err => res.send(err));
-});
-
+// Delete a product based on id
 app.delete('/product/:id', function(req, res){
     const id = req.params.id;
     Product.deleteOne({ _id: id }, function (err) {
