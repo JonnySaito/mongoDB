@@ -121,22 +121,22 @@ app.delete('/product/:id', function(req, res){
 // REGISTER route
 // Creating a route for registering new users; checking if the username already exists
 app.post('/users', function(req, res){
-    // We first want to check the database to see if there is already a user with the username we are registering
+    // We first want to check the database to see if there is already a user with the username we are registering.
     // The findOne function requires you to specify what column you are searching in and then with what value.
     // In this example, we are searching the User table, for the row which for the column username, matches the value we type in the front end (req.body.username)
     User.findOne({ username: req.body.username }, function (err, checkUser) {
         // checkUser is the result of the findOne() function.
         // If we find one then checkUser is an object with all the information about the user, but if we don't then checkUser is nothihng/null/empty
         if(checkUser){
-            // the username you are asking for already exists
+            // The username you're asking for already exists.
             res.send('user already exists');
         } else {
-            // the username you are asking for is available
+            // The username you're asking for is available.
 
             //hash the password
             const hash = bcrypt.hashSync(req.body.password);
-            // Create a user based on the User Model and fill it with the values from the front end
-            // Make sure to save your hashed password and not the regular one
+            // Create a user based on the User Model and fill it with the values from the front end.
+            // Make sure to save your hashed password and not the regular one.
             const user = new User({
                 _id: new mongoose.Types.ObjectId(),
                 username: req.body.username,
